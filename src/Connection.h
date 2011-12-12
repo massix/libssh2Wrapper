@@ -53,9 +53,9 @@ public:
     uint getPort() const;
     bool isUsingKey() const;
     bool isSessionValid() const;
-    string getHostName() const;
-    string getLastError() const;
-    string getLastExecutedCmd() const;
+    const string & getHostName() const;
+    const string & getLastError() const;
+    const string & getLastExecutedCmd() const;
     void setHostName(const string & hostName);
     void setPort(uint port);
     void setUsingKey(bool usingKey);

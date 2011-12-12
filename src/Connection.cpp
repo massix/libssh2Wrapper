@@ -41,17 +41,17 @@ Connection::~Connection()
 	close (hSocket);
 }
 
-string Connection::getHostName() const
+const string & Connection::getHostName() const
 {
 	return hostName;
 }
 
-string Connection::getLastError() const
+const string & Connection::getLastError() const
 {
 	return lastError;
 }
 
-string Connection::getLastExecutedCmd() const
+const string & Connection::getLastExecutedCmd() const
 {
 	return lastExecutedCmd;
 }
