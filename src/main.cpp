@@ -41,7 +41,8 @@ int main ()
 		if (connection.isSessionValid())
 			cout << "Connection OK" << endl;
 
-		connection("echo 'test public key' > libssh2");
+		string received_out = connection("ls ShakeInsulter");
+		cout << "Received output: " << endl << received_out << endl;
 
 	} catch (Exception & e) {
 		cout << "Exception caught: " << e.what() << endl;
