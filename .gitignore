@@ -3,6 +3,8 @@
 
 .project
 
+.settings
+
 Makefile
 
 src/Makefile
