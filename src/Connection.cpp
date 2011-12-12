@@ -181,10 +181,22 @@ const string & Connection::executeCmd(const string & cmd) throw (Exception)
 
 	lastExecutedCmd = cmd;
 
+	lastOutput = string();
+
+	char * block = new char[1024];
+	int read = 0;
+	while ((read = libssh2_channel_read(channel, block, 1024)) > 0) {
+		if (read < 1024)
+			block[read] = '\0';
+		lastOutput.append(block);
+	}
+
+	delete [] block;
+
 	libssh2_channel_close(channel);
 	libssh2_channel_free(channel);
 
-	return lastExecutedCmd;
+	return lastOutput;
 }
 
 const string & Connection::operator >>(const string & cmd) throw (Exception)

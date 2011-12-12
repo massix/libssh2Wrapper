@@ -65,6 +65,7 @@ public:
 private:
 	string				lastError;
 	string				lastExecutedCmd;
+	string				lastOutput;
 
 	LIBSSH2_SESSION * 	session;
 
