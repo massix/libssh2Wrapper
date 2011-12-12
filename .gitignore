@@ -12,3 +12,7 @@ autom4te.cache
 *.log
 
 src/.deps
+
+Debug
+
+Release
