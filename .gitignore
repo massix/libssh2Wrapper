@@ -16,3 +16,7 @@ src/.deps
 Debug
 
 Release
+
+*.o
+
+src/libssh2WrapperTest
