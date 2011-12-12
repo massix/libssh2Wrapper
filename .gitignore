@@ -1,0 +1,16 @@
+
+.cproject
+
+.project
+
+Makefile
+
+src/Makefile
+
+*.in
+
+autom4te.cache
+
+*.log
+
+src/.deps
