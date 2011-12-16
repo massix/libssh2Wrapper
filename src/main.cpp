@@ -22,6 +22,7 @@
 
 #include "Connection.h"
 #include "Exception.h"
+#include "UserInfo.h"
 
 #include <iostream>
 
@@ -34,14 +35,23 @@ int main ()
 {
 	try {
 		Connection connection("hostname", 22, true);
-		connection.setCredentials("username", "password");
-		connection.setKeyPath("path_to_.ssh_folder");
+//		connection.setCredentials("", "");
+//		connection.setKeyPath("");
+
+		UserInfo ui = connection.getUserInfo();
+
+		cout 	<< "User infos:\n"
+				<< "   login: " << ui.getUserName() << endl
+				<< "    home: " << ui.getHomeDir() << endl
+				<< "   shell: " << ui.getUserShell() << endl;
+
 		connection.mkConnection();
 
 		if (connection.isSessionValid())
 			cout << "Connection OK" << endl;
 
-		string received_out = connection("ls ShakeInsulter");
+		string received_out = connection("ls");
+		received_out.append(connection("whoami; id"));
 		cout << "Received output: " << endl << received_out << endl;
 
 	} catch (Exception & e) {
