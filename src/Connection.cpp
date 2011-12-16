@@ -82,7 +82,7 @@ void Connection::setPort(uint port)
 }
 
 Connection::Connection(bool useKey) throw (Exception) :
-	hostName("localhost"), port(22), usingKey(useKey), sessionValid(false)
+	hostName("localhost"), port(22), usingKey(useKey), sessionValid(false), keyPath("NOTSET")
 {
 #ifdef DEBUG
 	cout 	<< "Object initialized with\n"
@@ -93,7 +93,7 @@ Connection::Connection(bool useKey) throw (Exception) :
 }
 
 Connection::Connection(const string & hostName, uint port) throw (Exception) :
-	hostName(hostName), port(port), usingKey(false), sessionValid(false)
+	hostName(hostName), port(port), usingKey(false), sessionValid(false), keyPath("NOTSET")
 {
 #ifdef DEBUG
 	cout 	<< "Object initialized with\n"
@@ -104,7 +104,7 @@ Connection::Connection(const string & hostName, uint port) throw (Exception) :
 }
 
 Connection::Connection(const string & hostName, uint port, bool useKey) throw (Exception) :
-	hostName(hostName), port(port), usingKey(useKey), sessionValid(false)
+	hostName(hostName), port(port), usingKey(useKey), sessionValid(false), keyPath("NOTSET")
 {
 #ifdef DEBUG
 	cout 	<< "Object initialized with\n"
@@ -123,15 +123,14 @@ void Connection::mkConnection() throw (Exception)
 		throw Exception ("Hostname lookup failed :(");
 
 	struct sockaddr_in s;
-	s.sin_addr = *(struct in_addr *) he->h_addr_list[0];
+	s.sin_addr = *(struct in_addr*) (he->h_addr_list[0]);
 	s.sin_family = he->h_addrtype;
 	s.sin_port = htons (this->port);
-
 	hSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (hSocket < 0)
 		throw Exception ("Failed to create socket.");
 
-	if (connect(hSocket, (struct sockaddr *) &s, sizeof (struct sockaddr_in)) < 0)
+	if (connect(hSocket, (struct sockaddr*) &s, sizeof (struct sockaddr_in)) < 0)
 		throw Exception ("Failed to connect to remote host.");
 
 	session = libssh2_session_init();
@@ -140,28 +139,58 @@ void Connection::mkConnection() throw (Exception)
 		throw Exception ("Couldn't startup libssh2 :-(");
 
 	if (usingKey) {
-		string privateKey = keyPath;
-		privateKey.append("/id_rsa");
+		string privateKey;
+		string publicKey;
+		string internal_user;
 
-		string publicKey = keyPath;
-		publicKey.append("/id_rsa.pub");
+		if (userName.compare("") == 0)
+			internal_user = string(userInfo.getUserName());
+		else
+			internal_user = string(userName);
+
+		// Use the provided path to find the keypair
+		if (keyPath.compare("NOTSET") != 0) {
+			privateKey = keyPath;
+			privateKey.append("/id_rsa");
+
+			publicKey = keyPath;
+			publicKey.append("/id_rsa.pub");
+		}
+
+		// Try to guess where the user has his keypair
+		else {
+			privateKey = userInfo.getHomeDir();
+			privateKey.append("/.ssh/id_rsa");
+
+			publicKey = userInfo.getHomeDir();
+			publicKey.append("/.ssh/id_rsa.pub");
+		}
 #ifdef DEBUG
 		cout 	<< "    authenticating using AUTHKEY\n"
 				<< "    public key:  " << publicKey << endl
-				<< "    private key: " << privateKey << endl;
+				<< "    private key: " << privateKey << endl
+				<< "    username:    " << internal_user << endl;
 #endif
 
-		if (libssh2_userauth_publickey_fromfile(session, userName.c_str(), publicKey.c_str(), privateKey.c_str(), password.c_str()) != 0)
+		if (libssh2_userauth_publickey_fromfile(session, internal_user.c_str(), publicKey.c_str(), privateKey.c_str(), password.c_str()) != 0)
 			throw Exception ("Couldn't authenticate using keypair provided.");
-	}
+	} /* if (usingKey) */
 
 	else {
+		string internal_user;
+
+		if (userName.compare("") == 0)
+			internal_user = string(userInfo.getUserName());
+		else
+			internal_user = string(userName);
+
 #ifdef DEBUG
-		cout << "    authenticating using USERNAME AND PASSWORD" << endl;
+		cout 	<< "    authenticating using USERNAME AND PASSWORD" << endl
+				<< "    using USERNAME: " << internal_user << endl;
 #endif
-		if (libssh2_userauth_password(session, userName.c_str(), password.c_str()) != 0)
+		if (libssh2_userauth_password(session, internal_user.c_str(), password.c_str()) != 0)
 			throw Exception ("Couldn't authenticate using username and password provided.");
-	}
+	} /* else */
 
 	sessionValid = true;
 }
@@ -185,6 +214,7 @@ const string & Connection::executeCmd(const string & cmd) throw (Exception)
 
 	char * block = new char[1024];
 	int read = 0;
+
 	while ((read = libssh2_channel_read(channel, block, 1024)) > 0) {
 		if (read < 1024)
 			block[read] = '\0';
@@ -199,7 +229,7 @@ const string & Connection::executeCmd(const string & cmd) throw (Exception)
 	return lastOutput;
 }
 
-const string & Connection::operator >>(const string & cmd) throw (Exception)
+const string & Connection::operator>> (const string & cmd) throw (Exception)
 {
 	return executeCmd(cmd);
 }
@@ -218,6 +248,11 @@ void Connection::setCredentials(const string & userName, const string & password
 {
 	this->userName = userName;
 	this->password = password;
+}
+
+const UserInfo & Connection::getUserInfo() const
+{
+	return userInfo;
 }
 
 void Connection::setKeyPath(const string & path)

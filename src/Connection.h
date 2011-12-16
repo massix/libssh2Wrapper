@@ -27,7 +27,11 @@
 #include <string>
 #include <netdb.h>
 
+#include <sys/types.h>
+#include <pwd.h>
+
 #include "Exception.h"
+#include "UserInfo.h"
 
 using std::string;
 using SSH2Wrapper::Exception;
@@ -56,6 +60,7 @@ public:
     const string & getHostName() const;
     const string & getLastError() const;
     const string & getLastExecutedCmd() const;
+    const UserInfo & getUserInfo() const;
     void setHostName(const string & hostName);
     void setPort(uint port);
     void setUsingKey(bool usingKey);
@@ -79,6 +84,8 @@ private:
 	string				keyPath;
 
 	uint				hSocket;
+
+	UserInfo			userInfo;
 };
 
 } /* namespace SSH2Wrapper */
