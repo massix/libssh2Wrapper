@@ -196,7 +196,7 @@ void Connection::mkConnection() throw (Exception)
 	sessionValid = true;
 }
 
-const string & Connection::executeCmd(const string & cmd) throw (Exception)
+const string & Connection::executeCmd(const string & cmd, bool override) throw (Exception)
 {
 	if (!isSessionValid())
 		throw Exception ("How can you send commands if you don't connect?");
@@ -211,7 +211,8 @@ const string & Connection::executeCmd(const string & cmd) throw (Exception)
 
 	lastExecutedCmd = cmd;
 
-	lastOutput = string();
+	if (override)
+		lastOutput = string();
 
 	char * block = new char[1024];
 	int read = 0;
@@ -230,14 +231,20 @@ const string & Connection::executeCmd(const string & cmd) throw (Exception)
 	return lastOutput;
 }
 
-const string & Connection::operator>> (const string & cmd) throw (Exception)
+void Connection::resetBuffer ()
 {
-	return executeCmd(cmd);
+	lastOutput = string();
+}
+
+Connection & Connection::operator>> (const string & cmd) throw (Exception)
+{
+	executeCmd(cmd, false);
+	return *this;
 }
 
 const string & Connection::operator() (const string & cmd) throw (Exception)
 {
-	return executeCmd(cmd);
+	return executeCmd(cmd, true);
 }
 
 void Connection::setUsingKey(bool usingKey)
@@ -259,6 +266,11 @@ const UserInfo & Connection::getUserInfo() const
 void Connection::setKeyPath(const string & path)
 {
 	this->keyPath = path;
+}
+
+const string & Connection::getLastOutput() const
+{
+	return lastOutput;
 }
 
 } /* namespace SSH2Wrapper */

@@ -48,8 +48,8 @@ public:
 	virtual ~Connection ();
 
 	void			mkConnection() throw (Exception);
-	const string &	executeCmd (const string & cmd) throw (Exception);
-	const string &	operator>> (const string & cmd) throw (Exception);
+	const string &	executeCmd (const string & cmd, bool override = false) throw (Exception);
+	Connection &	operator>> (const string & cmd) throw (Exception);
 	const string &	operator() (const string & cmd) throw (Exception);
 
 
@@ -60,12 +60,14 @@ public:
     const string & getHostName() const;
     const string & getLastError() const;
     const string & getLastExecutedCmd() const;
+    const string & getLastOutput() const;
     const UserInfo & getUserInfo() const;
     void setHostName(const string & hostName);
     void setPort(uint port);
     void setUsingKey(bool usingKey);
     void setCredentials (const string & userName, const string & password = "");
     void setKeyPath (const string & path);
+    void resetBuffer ();
 
 private:
 	string				lastError;
