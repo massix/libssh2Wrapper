@@ -64,7 +64,7 @@ public:
     void setHostName(const string & hostName);
     void setPort(uint port);
     void setUsingKey(bool usingKey);
-    void setCredentials (const string & userName, const string & password);
+    void setCredentials (const string & userName, const string & password = "");
     void setKeyPath (const string & path);
 
 private:
