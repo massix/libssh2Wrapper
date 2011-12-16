@@ -50,8 +50,12 @@ int main ()
 		if (connection.isSessionValid())
 			cout << "Connection OK" << endl;
 
-		string received_out = connection("ls");
-		received_out.append(connection("whoami; id"));
+		connection 	>> "whoami"
+					>> "id"
+					>> "echo 'test' > msg"
+					>> "cat msg";
+
+		string received_out = connection.getLastOutput();
 		cout << "Received output: " << endl << received_out << endl;
 
 	} catch (Exception & e) {
