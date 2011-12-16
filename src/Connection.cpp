@@ -31,6 +31,39 @@ using std::endl;
 
 namespace SSH2Wrapper {
 
+Connection::Connection(bool useKey) throw (Exception) :
+	hostName("localhost"), port(22), usingKey(useKey), sessionValid(false), keyPath("NOTSET")
+{
+#ifdef DEBUG
+	cout 	<< "Object initialized with\n"
+			<< "    hostname -> " << this->hostName << endl
+			<< "    port     -> " << this->port << endl
+			<< "    usingKey -> " << this->usingKey << endl;
+#endif
+}
+
+Connection::Connection(const string & hostName, uint port) throw (Exception) :
+	hostName(hostName), port(port), usingKey(false), sessionValid(false), keyPath("NOTSET")
+{
+#ifdef DEBUG
+	cout 	<< "Object initialized with\n"
+			<< "    hostname -> " << this->hostName << endl
+			<< "    port     -> " << this->port << endl
+			<< "    usingKey -> " << this->usingKey << endl;
+#endif
+}
+
+Connection::Connection(const string & hostName, uint port, bool useKey) throw (Exception) :
+	hostName(hostName), port(port), usingKey(useKey), sessionValid(false), keyPath("NOTSET")
+{
+#ifdef DEBUG
+	cout 	<< "Object initialized with\n"
+			<< "    hostname -> " << this->hostName << endl
+			<< "    port     -> " << this->port << endl
+			<< "    usingKey -> " << this->usingKey << endl;
+#endif
+}
+
 Connection::~Connection()
 {
 	if (isSessionValid()) {
@@ -81,38 +114,6 @@ void Connection::setPort(uint port)
 	this->port = port;
 }
 
-Connection::Connection(bool useKey) throw (Exception) :
-	hostName("localhost"), port(22), usingKey(useKey), sessionValid(false), keyPath("NOTSET")
-{
-#ifdef DEBUG
-	cout 	<< "Object initialized with\n"
-			<< "    hostname -> " << this->hostName << endl
-			<< "    port     -> " << this->port << endl
-			<< "    usingKey -> " << this->usingKey << endl;
-#endif
-}
-
-Connection::Connection(const string & hostName, uint port) throw (Exception) :
-	hostName(hostName), port(port), usingKey(false), sessionValid(false), keyPath("NOTSET")
-{
-#ifdef DEBUG
-	cout 	<< "Object initialized with\n"
-			<< "    hostname -> " << this->hostName << endl
-			<< "    port     -> " << this->port << endl
-			<< "    usingKey -> " << this->usingKey << endl;
-#endif
-}
-
-Connection::Connection(const string & hostName, uint port, bool useKey) throw (Exception) :
-	hostName(hostName), port(port), usingKey(useKey), sessionValid(false), keyPath("NOTSET")
-{
-#ifdef DEBUG
-	cout 	<< "Object initialized with\n"
-			<< "    hostname -> " << this->hostName << endl
-			<< "    port     -> " << this->port << endl
-			<< "    usingKey -> " << this->usingKey << endl;
-#endif
-}
 
 void Connection::mkConnection() throw (Exception)
 {
