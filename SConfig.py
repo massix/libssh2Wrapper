@@ -11,7 +11,7 @@ CXX_FLAGS = '-DDEBUG -I/usr/local/include -O0 -g3 -Wall -c -fmessage-length=0'
 COMPILER_NAME = 'g++'
 PROJECT_NAME = 'libssh2Wrapper'
 INCLUDES = ['/usr/local/include']
-LIBRARIES = ['ssh2']
+LIBRARIES = ['ssh2', 'c']
 LIBRARY_PATHS = ['/usr/local/include']
 SOURCE_PATHS = {'src':[], 'libssh2Wrapper':['src']}
 PRE_BUILD_COMMAND = ''
